@@ -39,7 +39,7 @@ app.use(
 app.use(cookieparser());
 
 app.get("/", (req: Request, res: Response) => {
-  res.send("The Forum server")
+  res.send("I love youu bebi q hihi <3")
 })
 
 //Route usage
