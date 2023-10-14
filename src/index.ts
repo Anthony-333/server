@@ -27,7 +27,11 @@ app.use(
   cors({
     origin: [
       "http://localhost:5173",
-      "https://forum-vite.vercel.app",
+      "https://forum-vite.vercel.app/",
+      "http://forum-vite.vercel.app/",
+      "https://www.forum-vite.vercel.app/",
+      "https://forum-vite-2bcp8vib1-anthony-333.vercel.app/",
+      "http://forum-vite-2bcp8vib1-anthony-333.vercel.app/",
       "http://theforumgroup.org",
       "https://theforumgroup.org",
       "http://www.theforumgroup.org",
