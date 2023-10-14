@@ -10,7 +10,8 @@
   "scripts": {
     "build": "tsc",
     "dev": "nodemon --esm src/index.ts",
-    "start": "ts-node --esm src/index.ts"
+    "start": "ts-node --esm src/index.ts",
+    "postinstall": "tsc"
   },
   "keywords": [],
   "author": "",
