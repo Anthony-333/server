@@ -12,7 +12,7 @@ import { Server } from "socket.io";
 //For env File
 dotenv.config();
 const MONGO_DB = process.env.MONGO_DB;
-const PORT = process.env.PORT || 5001;
+const PORT = process.env.PORT || 5000;
 
 //Middleware
 const app: Application = express();
