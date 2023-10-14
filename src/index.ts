@@ -26,7 +26,6 @@ app.use(bodyParser.urlencoded({ limit: "30mb", extended: true }));
 app.use(
   cors({
     origin: [
-      "http://localhost:5173",
       "https://forum-vite.vercel.app/",
       "http://forum-vite.vercel.app/",
       "https://www.forum-vite.vercel.app/",
