@@ -12,7 +12,7 @@ import { Server } from "socket.io";
 //For env File
 dotenv.config();
 const MONGO_DB = process.env.MONGO_DB;
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5001;
 
 //Middleware
 const app: Application = express();
@@ -26,11 +26,7 @@ app.use(bodyParser.urlencoded({ limit: "30mb", extended: true }));
 app.use(
   cors({
     origin: [
-      "https://forum-vite.vercel.app/",
-      "http://forum-vite.vercel.app/",
-      "https://www.forum-vite.vercel.app/",
-      "https://forum-vite-2bcp8vib1-anthony-333.vercel.app/",
-      "http://forum-vite-2bcp8vib1-anthony-333.vercel.app/",
+      "https://652aa166ee71d63ad5c7d778--luminous-youtiao-3ba9a8.netlify.app",
       "http://theforumgroup.org",
       "https://theforumgroup.org",
       "http://www.theforumgroup.org",
