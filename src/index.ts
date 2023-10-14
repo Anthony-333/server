@@ -26,7 +26,7 @@ app.use(bodyParser.urlencoded({ limit: "30mb", extended: true }));
 app.use(
   cors({
     origin: [
-      "https://652aa166ee71d63ad5c7d778--luminous-youtiao-3ba9a8.netlify.app",
+      "http://localhost:5173",
       "http://theforumgroup.org",
       "https://theforumgroup.org",
       "http://www.theforumgroup.org",
