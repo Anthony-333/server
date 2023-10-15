@@ -2,11 +2,15 @@ import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import UserModel from "../models/UserModel.ts";
-import { SendOtpVerificationEmail } from "../Util/Utils.ts";
+import { SendVerificationEmail } from "../Util/Utils.ts";
+import TokenModel from "../models/TokenModel.ts";
+import crypto from "crypto";
 // import { io } from "../index.ts";
 
 const createToken = (id: string) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: "3d" });
+  return jwt.sign({ id }, process.env.JWT_SECRET, {
+    expiresIn: "3d",
+  });
 };
 
 const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -78,15 +82,28 @@ export const registerUser = async (req: Request, res: Response) => {
 
   try {
     const user = await newUser.save();
-    const token = createToken(user._id);
+    // const token = createToken(user._id);
 
-    return res.status(200).json({ message: "Successfuly signed up", user });
-    // return res.cookie("token", token, { httpOnly: true }).send();
+    if (user) {
+      const Token = new TokenModel({
+        userId: user._id,
+        token: crypto.randomBytes(32).toString("hex"),
+      });
 
-    // io.emit('new user', allusers);
+      const userToken = await Token.save();
 
-    // return res.status(200).cookie("token", token, { httpOnly: true });
-    // return res.cookie("token", token, { httpOnly: true }).send();
+      const url = `${process.env.CLIENT_ENDPOINT}/auth/${user._id}/verify-email/${userToken.token}`;
+
+      await SendVerificationEmail({
+        email: user.email,
+        subject: "Email Verification - The Forum",
+        text: url,
+      });
+    }
+
+    return res.status(200).json({
+      message: "Signed up Success! We've sent a verification on your inbox.",
+    });
   } catch (error) {
     return res.status(500).json({ error });
   }
@@ -95,6 +112,11 @@ export const registerUser = async (req: Request, res: Response) => {
 export const loginUser = async (req: Request, res: Response) => {
   const { username, password } = req.body;
 
+  if (!username || !password) {
+    return res.status(400).json({
+      message: "All fields are required.",
+    });
+  }
   try {
     let user = await UserModel.findOne({ username: username });
 
@@ -112,7 +134,9 @@ export const loginUser = async (req: Request, res: Response) => {
         });
       } else {
         const token = createToken(user._id);
-        return res.status(200).json({ user, token });
+        return res
+          .status(200)
+          .json({ message: "Signed in successfully.", user, token });
       }
     } else {
       return res.status(400).json({
@@ -121,5 +145,56 @@ export const loginUser = async (req: Request, res: Response) => {
     }
   } catch (error) {
     return res.status(500).json({ error });
+  }
+};
+
+export const verifyEmail = async (req: Request, res: Response) => {
+  const { _id, _token } = req.body;
+  try {
+    const user = await UserModel.findOne({ _id: _id });
+
+    if (!user)
+      return res.status(400).json({
+        message: "Invalid link Please request new.",
+      });
+
+    const token = await TokenModel.findOne({
+      userId: user._id,
+      token: _token,
+    });
+
+    if (!token)
+      return res.status(400).json({
+        message: "Invalid link Please request new.",
+      });
+
+    await UserModel.updateOne({ _id: user._id, emailVerified: true });
+    await TokenModel.findOneAndRemove();
+
+    return res.status(200).json({
+      message: "Email verified successfully.",
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: error,
+    });
+  }
+};
+
+export const verifylogin = async (req: Request, res: Response) => {
+  const { token } = req.body;
+
+  if (!token) {
+    return res.status(400).json({
+      message: "There's no token provided",
+    });
+  }
+
+  try {
+    await jwt.verify(token, process.env.JWT_SECRET);
+
+    return res.status(200).json({ message: "Token is valid" });
+  } catch (error) {
+    return res.status(401).json({ message: "Token is expired" });
   }
 };
